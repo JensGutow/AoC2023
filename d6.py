@@ -1,12 +1,15 @@
-# haltezeit: th=0..tr
-# speed = th
-# s=v*t1 = v*(tr-th)
+# input: t_game, s_game
+# haltezeit: th=0..t_game
+# speed = t_game
+# s(th) = v * th = v * (t_game - th) = th * (t_game -th)
+#       = -th^2 + t_game
+# s(th) = s_game -> find s1/s2
 
 import re,math
 def read_puzzle(file):
     lines = list(map(int,re.findall("[\d]+", open(file).read())))
-    l = len(lines)
-    return lines[:l//2], lines[l//2:]
+    l = len(lines)//2
+    return lines[:l], lines[l:]
 
 def find_n(t_game, s_game):
     p_2 = -t_game/2

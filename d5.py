@@ -1,16 +1,35 @@
 import re
 
-def calc_seed_revers_from_rule_in_hirarchie(rules, level, value):
-    for rule in rules[level,0,-1]:
-        y,x,delta = rule[1]
-        rule_rev = ["rev", [x,y,delta]]
-        value = apply_rule()
+def apply_subrule_reverse(y_start, x_start, delta, value):
+    x = value
+    if y_start <= x and x < y_start + delta:
+        x = x_start + (x - y_start)
+    return x
 
-    pass
+def apply_rule_reverse(rule, value):
+    x = value
+    for sub_rule in rule[1]:
+        x = apply_subrule_reverse(*sub_rule, x)
+        if x != value: break
+    return x
 
-def calc_seeds_revers_from_rules(rules):
-    seed_dict = dict()
-    pass
+def calc_seed_reverse_by_level(rules, level, value):
+    seed = value
+    for rule in rules[level::-1]:
+        seed = apply_rule_reverse(rule, seed)
+    return seed
+
+
+def calc_seeds_reverse_from_rules(rules):
+    seeds = set()
+    for i, rule in enumerate(rules):
+        for sub_rule in rule[1]:
+            y, _, delta = sub_rule
+            seed1 = calc_seed_reverse_by_level(rules, i, y)
+            seed2 = calc_seed_reverse_by_level(rules, i, y + delta - 1) + 1
+            seeds.add(seed1)
+            seeds.add(seed2)
+    return seeds
 
 def create_rule(s):
     args = s[0].split(" ")[0].split("-to-")
@@ -19,7 +38,7 @@ def create_rule(s):
 
 def apply_subrule(y_start, x_start, delta, x):
     y = x
-    if x_start <= x and x <= x_start + delta:
+    if x_start <= x and x < x_start + delta:
         y = y_start + (x - x_start)
     return y
 
@@ -47,17 +66,23 @@ def solve1(puzzle):
     seeds, rules = puzzle
     l = lambda seed: apply_rules(rules, seed)
     s1 = min(list(map(l, seeds)))
-    # ## task2
-    # seeds2 = []
-    # for i in range(len(seeds)//2):
-    #     for j in range(seeds[2*i+1]):
-    #         seeds2.append(seeds[2*i]+j)
-    # s2 = min(list(map(l, seeds2)))
-    
     return s1
+
+def solve2(puzzle):
+    l = lambda seed: apply_rules(rules, seed)
+    seeds, rules = puzzle
+    seed_checkpoints = calc_seeds_reverse_from_rules(rules)
+    loc_min = 1000000000000000000000000000000000000000000000000
+    for i in range(len(seeds)//2):
+        s1 = seeds[2*i]
+        s2 = seeds[2*i] + seeds[2*i + 1]
+        seed_to_check = [seed for seed in seed_checkpoints if s1 <= seed <= s2]
+        seed_to_check.append(s1)
+        l1 = min(list(map(l, seed_to_check)))
+        loc_min = min(loc_min,l1)
+    return loc_min
 
 puzzle = read_puzzle('d5.txt')
 
-
 print("Task 1", solve1(puzzle))
-#print("Task 2", solve1(puzzle))
+print("Task 2", solve2(puzzle))
