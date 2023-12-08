@@ -1,15 +1,13 @@
 import re, math
 def read_puzzle(file):
     items = re.findall("[0-9A-Z]+", open(file).read())
-    cmds = items[0]
     navi = dict()
     for i in range(len(items)//3):
         navi[items[3*i+1]] = (items[3*i+2], items[3*i+3])
-    return cmds, navi
+    return items[0], navi
 
 def get_n(navi, cmds, start, ziel):
     n = 0
-    s = start
     while not start in ziel:
         dir_inx = 0 if cmds[n % len(cmds)] == "L" else 1
         start = navi[start][dir_inx]
