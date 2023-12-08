@@ -19,8 +19,7 @@ def solve1(puzzle):
     starts = {start for start in list(navi.keys()) if start[-1]=="A" }
     ends = {start for start in list(navi.keys()) if start[-1]=="Z" }
     n2 = [get_n(navi, cmds, start, ends) for start in starts]
+    print(n2, sum(n2))
     return n1, math.lcm(*n2)
 
-puzzle = read_puzzle('d8.txt')
-
-print("Task 1/2", solve1(puzzle))
+print("Task 1/2", solve1(read_puzzle('d8.txt')))
