@@ -2,10 +2,8 @@ def read_puzzle(file):
     return [list(map(int, line.split())) for line in open(file).read().splitlines() ]
 
 def find_nr_in_list(values):
-    n = 0
     ends = []
     while any(i!=0 for i in values):
-        n += 1
         ends.append(values[-1])
         values = [values[i+1] - values[i] for i in range(len(values)-1)]
     return sum(ends)
