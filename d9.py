@@ -20,5 +20,4 @@ def solve1(puzzle):
     n2 = sum([find_nr_in_list(l[::-1]) for l in puzzle])
     return n1, n2
 
-puzzle = read_puzzle('d9.txt')
-print("Task 1/2", solve1(puzzle))
+print("Task 1/2", solve1(read_puzzle('d9.txt')))
