@@ -1,6 +1,5 @@
-import re 
 def read_puzzle(file):
-    return [list(map(int, re.findall("[-]?[\d]+", line))) for line in open(file).read().splitlines() ]
+    return [list(map(int, line.split())) for line in open(file).read().splitlines() ]
 
 def find_nr_in_list(values):
     n = 0
@@ -26,4 +25,4 @@ def solve1(puzzle):
 
 puzzle = read_puzzle('d9.txt')
 
-print("Task 1", solve1(puzzle))
+print("Task 1/2", solve1(puzzle))
