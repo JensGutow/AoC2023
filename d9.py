@@ -11,18 +11,14 @@ def find_nr_in_list(values):
     values.append(0)
     for i in range(n):
         l1 = [start_values[n-i-1]]
-        for v in values:
-            l1.append(l1[-1]+v)
+        for v in values: l1.append(l1[-1]+v)
         values = l1
-    first = 0
-    for v in start_values[::-1]:
-        first = v - first
-    return(values[-1], first )
+    return values[-1]
 
 def solve1(puzzle):
-    solutions = [find_nr_in_list(l) for l in puzzle]
-    return[sum(values)  for values in zip(*solutions)]
+    n1 = sum([find_nr_in_list(l) for l in puzzle])
+    n2 = sum([find_nr_in_list(l[::-1]) for l in puzzle])
+    return n1, n2
 
 puzzle = read_puzzle('d9.txt')
-
 print("Task 1/2", solve1(puzzle))
