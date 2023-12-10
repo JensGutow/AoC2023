@@ -1,6 +1,11 @@
 import heapq
 
 Y_MAX = X_MAX = 0
+DIRS = "NESW"
+DIRS_BY_PIPE = {"-":"EW","|":"SN","F":"SE","J":"NW","L":"NE","7":"WS"}
+MOVES = {"N":(0,-1), "E":(1,0),"S":(0,1),"W":(-1,0)}
+PIPES = "S-|FJL7"
+NEXT_PIPES ={"E":"J7-", "S":"J|L", "W":"-LF", "N":"|7F"}
 
 def read_puzzle(file, part1=True):
     global X_MAX
@@ -15,17 +20,9 @@ def read_puzzle(file, part1=True):
                 pipes[(x,y)] = c
             if c == "S":start = (x,y)
             if c in PIPES: pipes[(x,y)] = c
-
     X_MAX = x + 1
     Y_MAX = y + 1
     return start, pipes
-
-
-DIRS = "NESW"
-DIRS_BY_PIPE = {"-":"EW","|":"SN","F":"SE","J":"NW","L":"NE","7":"WS"}
-MOVES = {"N":(0,-1), "E":(1,0),"S":(0,1),"W":(-1,0)}
-PIPES = "S-|FJL7"
-NEXT_PIPES ={"E":"J7-", "S":"J|L", "W":"-LF", "N":"|7F"}
 
 def replace_S(start, pipes):
     valid_conn = {"SN":"|", "NS":"|", "WE":"-","EW":"-", 
@@ -50,31 +47,12 @@ def get_next_items(pipes, item):
     for dir in DIRS_BY_PIPE[pipes[item]]:
         deltax, deltay = MOVES[dir]
         x1 = (x + deltax)
-        x1_mod = x1%X_MAX
         y1 = (y + deltay)
-        y1_mod = y1%Y_MAX
-        if (x1_mod, y1_mod) in pipes:
-            c = pipes[(x1_mod,y1_mod)] 
+        if (x1, y1) in pipes:
+            c = pipes[(x1, y1)] 
             if c in NEXT_PIPES[dir]:
                 next_items.add((x1,y1))
-                if (x1,y1) not in pipes:
-                    pipes[(x1,y1)] = c
-                    print("add ",x1,y1)
     return next_items
-
-print_pipes = dict()
-def print_counts(queue):
-    for item in queue:
-        count, pos = item 
-        print_pipes[pos] = count
-    for y in range(Y_MAX):
-        l = ""
-        for x in range(Y_MAX):
-            c = print_pipes[(x,y)] if (x,y) in print_pipes else "."
-            l += str(c)
-        print(l)
-    print("")
-    return
     
 def get_cross_points(pipes, visited, x,y):
     n = 0
@@ -82,10 +60,9 @@ def get_cross_points(pipes, visited, x,y):
         xp, yp = point
         if y == yp and xp > x:
             c = pipes[point]
-            if c in "|JL": n += 1
+            if c in "|F7": n += 1
     return n
     
-
 def solve1(puzzle):
     start, pipes = puzzle
     visited = set()
@@ -117,18 +94,7 @@ def solve1(puzzle):
             n = get_cross_points(pipes, visited, x,y)
             if (n%2):
                 N += 1
-
     return max_pos, max_count, N
-
-def solve2(puzzle):
-    start, pipes = puzzle
-    for y in range(Y_MAX):
-        l = ""
-        for x in range(X_MAX):
-            c = pipes[(x,y)] if (x,y) in pipes else " "
-            l += str(c)
-        print(l)
-    print("")
     
 puzzle = read_puzzle('d10.txt')
 print("Task 1", solve1(puzzle))
