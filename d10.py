@@ -2,15 +2,20 @@ import heapq
 
 Y_MAX = X_MAX = 0
 
-def read_puzzle(file):
+def read_puzzle(file, part1=True):
     global X_MAX
     global Y_MAX
     pipes = dict() # x,y: (Pipe, count)
     start = 0
     for y, line in enumerate(open(file).read().splitlines()):
         for x, c in enumerate(line):
+            if not part1:
+                if c in "FJL7": 
+                    c= "┌┘└┐"["FJL7".index(c)]
+                pipes[(x,y)] = c
             if c == "S":start = (x,y)
             if c in PIPES: pipes[(x,y)] = c
+
     X_MAX = x + 1
     Y_MAX = y + 1
     return start, pipes
@@ -59,7 +64,6 @@ def get_next_items(pipes, item):
 
 print_pipes = dict()
 def print_counts(queue):
-    pipes = dict()
     for item in queue:
         count, pos = item 
         print_pipes[pos] = count
@@ -71,6 +75,15 @@ def print_counts(queue):
         print(l)
     print("")
     return
+    
+def get_cross_points(pipes, visited, x,y):
+    n = 0
+    for point in visited:
+        xp, yp = point
+        if y == yp and xp > x:
+            c = pipes[point]
+            if c in "|JL": n += 1
+    return n
     
 
 def solve1(puzzle):
@@ -95,9 +108,27 @@ def solve1(puzzle):
                 max_count = count
                 max_pos = item
             #print_counts(queue)
-    return max_pos, max_count
+    # part 2: Punkt-in-Polygon-Test nach Jordan 
+    #wagerechte Linien: L---J  
+    N = 0
+    for x in range(X_MAX):
+        for y in range(Y_MAX):
+            if (x,y) in visited: continue
+            n = get_cross_points(pipes, visited, x,y)
+            if (n%2):
+                N += 1
 
+    return max_pos, max_count, N
+
+def solve2(puzzle):
+    start, pipes = puzzle
+    for y in range(Y_MAX):
+        l = ""
+        for x in range(X_MAX):
+            c = pipes[(x,y)] if (x,y) in pipes else " "
+            l += str(c)
+        print(l)
+    print("")
+    
 puzzle = read_puzzle('d10.txt')
-
 print("Task 1", solve1(puzzle))
-#print("Task 2", solve1(puzzle))
