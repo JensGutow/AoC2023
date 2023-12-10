@@ -16,5 +16,6 @@ def solve1(puzzle):
     return n1, n2
 
 time_start = time.perf_counter()
+
 print("Task 1/2", solve1(read_puzzle('d9.txt')))
 print(f'Solved in {time.perf_counter()-time_start:.5f} Sec.')
