@@ -14,10 +14,6 @@ def read_puzzle(file, part1=True):
     start = 0
     for y, line in enumerate(open(file).read().splitlines()):
         for x, c in enumerate(line):
-            if not part1:
-                if c in "FJL7": 
-                    c= "┌┘└┐"["FJL7".index(c)]
-                pipes[(x,y)] = c
             if c == "S":start = (x,y)
             if c in PIPES: pipes[(x,y)] = c
     X_MAX = x + 1
@@ -70,9 +66,6 @@ def solve1(puzzle):
     pos = start
     replace_S(start, pipes)
     heapq.heappush(queue, (0, pos))
-    max_pos = (0,0)
-    max_count = 0
-    n1 = 0
     while queue:
         count, pos = heapq.heappop(queue)
         count += 1
@@ -81,10 +74,6 @@ def solve1(puzzle):
         for item in get_next_items(pipes, pos):
             if item in visited: continue
             heapq.heappush(queue, (count, item))
-            if count > max_count:
-                max_count = count
-                max_pos = item
-            #print_counts(queue)
     # part 2: Punkt-in-Polygon-Test nach Jordan 
     #wagerechte Linien: L---J  
     N = 0
@@ -94,7 +83,7 @@ def solve1(puzzle):
             n = get_cross_points(pipes, visited, x,y)
             if (n%2):
                 N += 1
-    return max_pos, max_count, N
+    return count, N
     
 puzzle = read_puzzle('d10.txt')
 print("Task 1", solve1(puzzle))
