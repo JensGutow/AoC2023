@@ -5,11 +5,9 @@ def read_puzzle(file):
 def dist(p1, p2, cols, rows, repeat):
     x1, y1 = p1
     x2, y2 = p2
-    dx1 = abs(x2 - x1)
-    dy1 = abs(y2 - y1)
     dx2 = len([1 for c in cols if min(x1,x2) < c < max(x1,x2)]) * repeat
     dy2 = len([1 for c in rows if min(y1,y2) < c < max(y1,y2)]) * repeat
-    return dx1 + dx2 + dy1 + dy2
+    return abs(x2 - x1) + dx2 + abs(y2 - y1) + dy2
 
 def solve1(puzzle):
     rows = [i for i,line in enumerate(puzzle) if "#" not in line]
