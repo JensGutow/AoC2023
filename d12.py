@@ -53,6 +53,8 @@ def find_arrangement(cond_record, groups):
         results = results.union(temp)
     return results
 
+# the solution was inspirated by Gravitar 64
+# see: https://github.com/Gravitar64/Advent-of-Code-2023/blob/main/day12.py
 # importand for part2
 # saves known solution for lower arguments -> strong reduction of the necessary amount of calculation
 # the function parameter are used as a key for an internal dictionary.
