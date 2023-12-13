@@ -1,36 +1,28 @@
-# 
 def read_puzzle(file):
     return [p.split() for p in  open(file).read().split("\n\n")]
 
-def count_mirror(pattern):
-    n = 0
+def count_mirrors(pattern, part1 = True):
     l = len(pattern)
-    for k in range(1,l):
-        test = True
-        for j in range(min(k,l-k )):
-            inx1 = k-j-1
-            inx2 = k+j
-            n=k
-            if pattern[inx1] != pattern[inx2]:
-                test = False
-                n = 0
-                break
-        if test: break
-    return n
+    for k in range(1,len(pattern)):
+        m = min(k, l-k)
+        a = pattern[k-m:k][::-1]
+        b = pattern[k:k+m]
+        if part1:
+            if a==b : return k
+        else:
+            if sum([c1 != c2 for l1, l2 in zip(a,b) for c1, c2 in zip(l1,l2)]) == 1: return k
+    return 0
 
 def solve1(puzzle):
-    h = v = 0
-    for i, p in enumerate(puzzle):
-        #print("pattern", i)
-        #print("horz")
-        h += count_mirror(p)
-        #print("vert")
-        v += count_mirror(list(zip(*p)))
+    h2 = v2 = h = v = 0
+    for p in puzzle:
+        h += count_mirrors(p)
+        v +=  count_mirrors(list(zip(*p)))
+        h2 += count_mirrors(p, False)
+        v2 +=  count_mirrors(list(zip(*p)), False)
 
-        #print("horz",h, "vert",v )
-    return h*100 + v
+    return h*100 + v, h2*100 + v2
 
 puzzle = read_puzzle('d13.txt')
 
 print("Task 1", solve1(puzzle))
-#print("Task 2", solve1(puzzle))
