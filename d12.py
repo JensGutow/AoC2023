@@ -13,11 +13,17 @@ def test_arrangement(test, groups):
     check2 = [len(s) for s in test]
     result = True if "?" in test2 else len(check2) == len(groups)
     if result:
+
+#if  len(conds) < gr[0] or '.' in conds[:gr[0]] or conds[gr[0]] == '#': 
+
         for sub, a,b in zip(test, check2, groups):
             if not "?" in sub:
-                if a != b:
+                if (a != b):
                     result = False
                     break
+            elif (len(sub) < b) or ((len(sub)>b) and (sub[b] =="#")):
+                result = False
+                break
             else:
                 break
     return result
@@ -32,7 +38,6 @@ def find_arrangement(cond_record, groups):
         weiter = False
         temp = set()
         if inx_old != inx:
-            print(inx)
             inx_old = inx
         while results:
             cond_record = results.pop()
@@ -51,7 +56,7 @@ def find_arrangement(cond_record, groups):
                 if test_arrangement(test1, groups):temp.add(test1)
                 if test_arrangement(test2, groups):temp.add(test2)
         results = results.union(temp)
-    return results
+    return len(results)
 
 # the solution was inspirated by Gravitar 64
 # see: https://github.com/Gravitar64/Advent-of-Code-2023/blob/main/day12.py
@@ -100,15 +105,16 @@ def amounts(conds, gr):
     return amounts("#"+ conds[1:], gr) + amounts(conds[1:], gr)
 
 def solve1(puzzle):
-    n1 = n2 = 0
+    n1b = n1 = n2 = 0
     for line in puzzle:
         cond_record, groups = line
         # avoid an error if an index acces after the end of line -> add a neutral "." 
         n1 += (amounts(cond_record+".", groups))
+        n1b += find_arrangement(cond_record+".", groups)
         conds2 = ((cond_record+"?")*4)+cond_record
         groups2 = groups * 5
         n2 += (amounts(conds2+".", groups2))
-    return n1, n2
+    return n1,n1b, n2
 
 puzzle = read_puzzle('d12.txt')
 
