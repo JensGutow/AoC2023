@@ -31,7 +31,8 @@ def get_neighbors(puzzle, pos, dirs):
 def get_energy_value(puzzle):
     return sum([1 for _, dirs in puzzle.values() if dirs])
 
-def bfs(puzzle,start, dir):
+def bfs(p,start, dir):
+    puzzle = deepcopy(p)
     visited = defaultdict(set) # pos:dirs
     queue = defaultdict(set) # pos:dirs
     queue[start] = dir
@@ -49,22 +50,17 @@ def bfs(puzzle,start, dir):
     return get_energy_value(puzzle)
 
 def solve(puzzle):
-    p = deepcopy(puzzle)
     part1 =  bfs(puzzle, (0,0), "E")
-    puzzle = deepcopy(p)
 
-    check_points = [
-    ("E", [(X_MIN, y) for y in range(Y_MIN, Y_MAX + 1)]),
-    ("W", [(X_MAX, y) for y in range(Y_MIN, Y_MAX + 1)]),
-    ("S", [(x, Y_MIN) for x in range(X_MIN, X_MAX + 1)]),
-    ("N", [(x, Y_MAX) for x in range(X_MIN, X_MAX + 1)])
-    ]
+    check_points = [("E", [(X_MIN, y) for y in range(Y_MIN, Y_MAX + 1)]),
+                    ("W", [(X_MAX, y) for y in range(Y_MIN, Y_MAX + 1)]),
+                    ("S", [(x, Y_MIN) for x in range(X_MIN, X_MAX + 1)]),
+                    ("N", [(x, Y_MAX) for x in range(X_MIN, X_MAX + 1)])]
     part2 = 0
     for cp in check_points:
         dir, starts = cp
         for start in starts:
-            p = deepcopy(puzzle)
-            part2 = max(part2, bfs(p, start, dir))
+            part2 = max(part2, bfs(puzzle, start, dir))
     return part1, part2
 
 puzzle, X_MAX, Y_MAX = read_puzzle('d16.txt')
