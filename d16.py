@@ -28,10 +28,11 @@ def get_nb(puzzle, pos, dirs):
     c, _ = puzzle[pos]
     nbs = []
     for dir in dirs:
-        for d in BEAM_RULES[(dir, c)]:
-            dx, dy = DIRS[d]
-            if (x+dx, y+dy) in list(puzzle.keys()):
-                nbs.append(((x+dx, y+dy), d)) # pos, dir
+        for new_dir in BEAM_RULES[(dir, c)]:
+            dx, dy = DIRS[new_dir]
+            new_point = (x+dx, y+dy)
+            if new_point in list(puzzle.keys()):
+                nbs.append((new_point, new_dir)) # pos, dir
     return nbs
 
 def print_energy_status(puzzle):
@@ -44,7 +45,7 @@ def print_energy_status(puzzle):
         print(line)
 
 def get_energy(puzzle):
-    return sum([1 for c, dirs in puzzle.values() if dirs])
+    return sum([1 for _, dirs in puzzle.values() if dirs])
 
 def calc_energy(puzzle,start, dir):
     visited = defaultdict(set) # pos:dirs
@@ -57,18 +58,14 @@ def calc_energy(puzzle,start, dir):
         p_c, p_dirs = puzzle[pos]
         puzzle[pos] = (p_c, p_dirs.union(dirs))
         visited[pos] = "".join(set(visited[pos]).union(dirs))
-        for next_pos in  get_nb(puzzle, pos, dirs):
-            n_pos, n_dir = next_pos
+        for next_pos_dir in  get_nb(puzzle, pos, dirs):
+            n_pos, n_dir = next_pos_dir
             queue[n_pos] = queue[n_pos].union(set(n_dir))
     #print_energy_status(puzzle)
     return get_energy(puzzle)
 
 def reset(puzzle):
-    p = dict()
-    for k,v in puzzle.items():
-        kachel, _ = v
-        p[k] = [kachel, set()]
-    return p
+    return {k:[v[0],set()] for k,v in puzzle.items()}
 
 def solve1(puzzle):
     return calc_energy(puzzle, (0,0), "E")
