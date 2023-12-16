@@ -1,4 +1,3 @@
-from collections import defaultdict
 from copy import deepcopy
 
 X_MAX = Y_MAX = X_MIN = Y_MIN = 0
@@ -33,21 +32,20 @@ def get_energy_value(puzzle):
 
 def bfs(p,start, dir):
     puzzle = deepcopy(p)
-    visited = defaultdict(set) # pos:dirs
-    queue = defaultdict(set) # pos:dirs
-    queue[start] = dir
+    visited = set()
+    queue = []
+    queue.append((start, dir))
     while queue:
-        pos = list(queue.keys())[0]
-        dirs = queue.pop(pos)
-        if set(dirs).issubset(visited[pos]): continue
+        pos, dir = queue.pop(0)
+        if (dir, pos) in visited : continue
         p_c, p_dirs = puzzle[pos]
-        puzzle[pos] = (p_c, p_dirs.union(dirs))
-        dirs =  "".join(list((set(dirs) - set(visited[pos]))))
-        visited[pos] = "".join(set(visited[pos]).union(dirs))
-        for next_pos_dir in  get_neighbors(puzzle, pos, dirs):
-            n_pos, n_dir = next_pos_dir
-            queue[n_pos] = queue[n_pos].union(set(n_dir))
-    return get_energy_value(puzzle)
+        puzzle[pos] = (p_c, p_dirs.union(dir))
+        visited.add((dir, pos))
+        for next_pos_dir in  get_neighbors(puzzle, pos, dir):
+            queue.append(next_pos_dir)
+    e = get_energy_value(puzzle)
+    print(e)
+    return e
 
 def solve(puzzle):
     part1 =  bfs(puzzle, (0,0), "E")
