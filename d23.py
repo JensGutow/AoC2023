@@ -1,64 +1,106 @@
-import copy
-import heapq
+
+from collections import defaultdict
+    
 def read_puzzle(file):
-    start = None
-    end = None
+    input = open(file).readlines()
+    ymax = len(input)
+    xmax = len(input[0].strip())
+    line = input[0].strip()
+    start = line.index(".") + 0j
+    line = input[-1]
+    end = line.index(".") + (ymax-1)*(1j)
+
+    assert(xmax == ymax)
+
     d = dict()
-    for y, line in  enumerate(open(file).readlines()):
+    for y, line in  enumerate(input):
         for x, c in enumerate(line.strip()):
-            if not start and c == ".": start=(x,y)
-            d[(x,y)] = c
-        end = (line.index("."),y)
-    assert(x==y)
-    return d, x,start, end
+            d[(x+y*(1j))] = c
 
-DIR_SOPE = {(1,0):">", (-1,0):"<", (0,1):"v", (0,-1):"^"}
+    return d, xmax,start, end
 
-def get_max_path_len(path, end, d, maxy):
-    if path[-1] == end: return len(path)
+DIR_SOPE = {(1+0j):">", (-1+0j):"<", (0+1j):"v", (0-1j):"^"}
 
-    max_len = len(path)
-    point = path[-1]
-    x,y = point
-    path2 = copy.copy(path)
-    new_points = []
-    append = True
-    consecutive_points = []
-    while append:
-        append = False
-        for delta in [(1,0),(-1,0),(0,1),(0,-1)]:
-            dx,dy = delta
-            point_new = (x+dx,y+dy)
-            if point_new not in d: continue
-            if point_new in path: continue
-            if point_new in consecutive_points: continue
-            c = d[point_new]
-            if c == "#": continue
-            #if c != "." and c!=DIR_SOPE[delta] :continue
-            new_points.append(point_new)
-            if point_new == end: 
-                return max_len + len(new_points) + len(consecutive_points)
-        if len(new_points)==0:return 0
-        if len(new_points) == 1:
-            append = True
-            x, y = new_points.pop()
-            consecutive_points.append((x,y))
-    path2.extend(consecutive_points)
-    for new_p in new_points:
-        path2.append(new_p)        
-        max_len = max(max_len, get_max_path_len(path2,end,d,maxy))
-        path2.pop(-1)
-    return max_len
+NBS = {">" :[(1+0j)], "<" :[(-1+0j)],"v" :[(0+1j)],"^" :[(0-1j)],
+        ".":[(1+0j),(-1+0j),(0+1j),(0-1j)]}
+
+def get_nbs(c, part1):
+    if part1:
+        NBS = {">" :[(1+0j)], "<" :[(-1+0j)],"v" :[(0+1j)],"^" :[(0-1j)],
+        ".":[(1+0j),(-1+0j),(0+1j),(0-1j)]}
+        return NBS[c]
+    else:
+        return [(1+0j),(-1+0j),(0+1j),(0-1j)]
 
 
-def solve1(puzzle):
+def get_points(d, start, end, part1):
+    stack = [start]
+    visited = []
+    points = [start, end]
+    while stack:
+        point = stack.pop()
+        if point in visited: continue
+        visited.append(point)
+        n = 0
+        for dir in get_nbs(d[point], part1):
+            point_n = point + dir
+            if point_n in d and point_n not in visited and d[point_n]!="#": 
+                stack.append(point_n)
+                n += 1
+        if n>=2: 
+            points.append(point)
+    return points
+
+def build_graph(d, points, part1):
+    graph = defaultdict(dict)
+    for point in points:
+        graph[point] = dict()
+        visited = []
+        stack = [(0, point)]
+        while stack:
+            n, point_n = stack.pop()
+            if point_n in visited: continue
+            visited.append(point_n)
+            for dir in get_nbs(d[point_n], part1):
+                point_k = point_n + dir
+                if point_k in d and point_k not in visited and d[point_k]!="#": 
+                    if point_k not in points:
+                        stack.append((n+1, point_k))
+                    else:
+                        graph[point][point_k] = n + 1
+    print("GRAPH")
+    for pt in graph:
+        print("(",pt.real,",",pt.imag,"): ",end="" )
+        for 
+    return graph
+
+END = ()
+VISITED = set()
+GRAPH = dict()
+def get_max_path_len(point):
+    if point == END : return 0
+    l = 0
+    VISITED.add(point)
+    for pt in GRAPH[point]:
+        if pt in VISITED: continue
+        l = max(get_max_path_len(pt), GRAPH[point][pt])
+    VISITED.remove(point)
+    return l
+
+def solve1(puzzle, part1):
+    global GRAPH, END
     d, maxxy, start, end = puzzle
-
-    max_len = get_max_path_len([start], end,d, maxxy)
-    return max_len-1
+    points = get_points(d, start, end, part1)
+    print("points:", len(points))
+    graph = build_graph(d, points, part1)
+    print("graph", len(graph))
+    END = end
+    GRAPH = graph
+    l =  get_max_path_len(start)
+    return l
 
 
 puzzle = read_puzzle('d23.txt')
 
-print("Task 1", solve1(puzzle))
-#print("Task 2", solve1(puzzle))
+print("Task 1", solve1(puzzle, part1 = True) )
+print("Task 2", solve1(puzzle, part1 = False))
