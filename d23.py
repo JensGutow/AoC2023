@@ -19,11 +19,6 @@ def read_puzzle(file):
 
     return d, xmax,start, end
 
-DIR_SOPE = {(1+0j):">", (-1+0j):"<", (0+1j):"v", (0-1j):"^"}
-
-NBS = {">" :[(1+0j)], "<" :[(-1+0j)],"v" :[(0+1j)],"^" :[(0-1j)],
-        ".":[(1+0j),(-1+0j),(0+1j),(0-1j)]}
-
 def get_nbs(c, part1):
     if part1:
         NBS = {">" :[(1+0j)], "<" :[(-1+0j)],"v" :[(0+1j)],"^" :[(0-1j)],
@@ -67,11 +62,7 @@ def build_graph(d, points, part1):
                     if point_k not in points:
                         stack.append((n+1, point_k))
                     else:
-                        graph[point][point_k] = n + 1
-    print("GRAPH")
-    for pt in graph:
-        print("(",pt.real,",",pt.imag,"): ",end="" )
-        for 
+                        graph[point][point_k] = n + 1  
     return graph
 
 END = ()
@@ -79,11 +70,11 @@ VISITED = set()
 GRAPH = dict()
 def get_max_path_len(point):
     if point == END : return 0
-    l = 0
+    l = -float("inf")
     VISITED.add(point)
     for pt in GRAPH[point]:
         if pt in VISITED: continue
-        l = max(get_max_path_len(pt), GRAPH[point][pt])
+        l = max(l, get_max_path_len(pt) + GRAPH[point][pt])
     VISITED.remove(point)
     return l
 
@@ -91,14 +82,14 @@ def solve1(puzzle, part1):
     global GRAPH, END
     d, maxxy, start, end = puzzle
     points = get_points(d, start, end, part1)
-    print("points:", len(points))
+    points2 = []
+    for p in points:
+        points2.append((p.imag, p.real))
     graph = build_graph(d, points, part1)
-    print("graph", len(graph))
     END = end
     GRAPH = graph
     l =  get_max_path_len(start)
     return l
-
 
 puzzle = read_puzzle('d23.txt')
 
