@@ -1,5 +1,6 @@
-import re
+import re, math
 import itertools
+from sympy import symbols, Eq, solve
 def read_puzzle(file):
     hairs = []
     for i, line in enumerate(open(file).readlines()):
@@ -55,7 +56,39 @@ def solve1(puzzle):
                     n +=1
     return n
 
+def eq(x, i):
+    eq_l = f"{x}+V{x}*t{i}"
+    eq_r = f"{x}st+V{x}st*t{i}"
+    return eq_l, eq_r
+
+def std_v(vect):
+    l = math.sqrt(sum([v*v for v in vect]))
+    k = 1 if vect[0]>0 else -1
+    v2 = [v*k/l for v in vect ]
+    return v2
+
+def solve2(puzzle):
+    l = len(puzzle)
+    Xst, Yst, Zst, VXst, VYst, VZst, t0, t1, t2 = symbols("Xst Yst Zst VXst VYst VZst t0 t1 t2")
+    eqs = []
+    i = 0
+    v_vectors = []
+    j = 0
+    while i < 3:
+        X, Y, Z, VX, VY, VZ = puzzle[j]
+        j += 1
+        sv = std_v([VX,VY,VZ])
+        if sv in v_vectors: continue
+        v_vectors.append(sv)
+        for v in "XYZ":
+            eq_l, eq_r = eq(v,i)
+            eqs.append(Eq(eval(eq_l),eval(eq_r)))
+        i += 1
+    solution = solve(tuple(eqs), (Xst, Yst, Zst, VXst, VYst, VZst, t0, t1, t2))
+    return sum(solution[0][:3])
+
+
 puzzle = read_puzzle('d24.txt')
 
 print("Task 1", solve1(puzzle))
-#print("Task 2", solve1(puzzle))
+print("Task 2", solve2(puzzle))
